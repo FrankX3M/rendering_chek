@@ -344,14 +344,7 @@ def fetch_bot_html(url: str, cfg: dict) -> tuple[str, str]:
                 except: pass
 
     if html:
-        fname = f"view_bot_{bot_mode}.html"
-        try:
-            with open(fname, "w", encoding="utf-8") as f:
-                f.write(html)
-            print(f"  💾 Сохранено: {fname}  ({len(html.encode())/1024:.1f} KB)")
-        except Exception as e:
-            print(f"  ⚠  Не удалось сохранить файл: {e}")
-        print("  ✅ HTML бота получен")
+        print(f"  ✅ HTML бота получен  ({len(html.encode())/1024:.1f} KB)")
     else:
         print("  ❌ Не удалось получить HTML бота")
 
@@ -408,14 +401,6 @@ def read_user_html(url: str, user_mode: str) -> str:
 
     size_kb = len(html.encode()) / 1024
     print(f"\n  ✅ Получено {len(html):,} симв. ({size_kb:.1f} KB)")
-
-    fname = f"view_user_{user_mode}.html"
-    try:
-        with open(fname, "w", encoding="utf-8") as f:
-            f.write(html)
-        print(f"  💾 Сохранено: {fname}")
-    except Exception as e:
-        print(f"  ⚠  Не удалось сохранить файл: {e}")
 
     return html
 
@@ -783,8 +768,6 @@ def diff_proto_blocks(bot: list, user: list) -> tuple:
 # ═══════════════════════════════════════════════════════════════
 
 def create_report(
-    bot_file, user_file,
-    bot_screenshot, user_screenshot,
     bot_metrics, user_metrics,
     bot_details, user_details,
     bot_proto, user_proto,
@@ -1283,10 +1266,9 @@ def run_check(url: str, cfg: dict):
 
     # ШАГ 4
     print("\n  ── ШАГ 4: генерация отчёта ─────────────────────────────")
-    bot_file  = f"view_bot_{bot_mode}.html"
-    user_file = f"view_user_{user_mode}.html"
-    safe_url  = re.sub(r"[^\w]", "_", url)[:50]
-    out       = f"report_{safe_url}.html"
+    safe_url  = re.sub(r"[^\w]", "_", url)[:40]
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    out       = f"report_{timestamp}_{safe_url}.html"
 
     print("  🔍 Считаю метрики…")
     bot_bm = get_basic_metrics(bot_html)
@@ -1300,9 +1282,6 @@ def run_check(url: str, cfg: dict):
     bot_p, usr_p = diff_proto_blocks(bot_p, usr_p)
 
     html_report = create_report(
-        bot_file=bot_file,       user_file=user_file,
-        bot_screenshot=f"screenshot_bot_{bot_mode}.png",
-        user_screenshot=f"screenshot_user_{user_mode}.png",
         bot_metrics=bot_bm,      user_metrics=usr_bm,
         bot_details=bot_d,       user_details=usr_d,
         bot_proto=bot_p,         user_proto=usr_p,
